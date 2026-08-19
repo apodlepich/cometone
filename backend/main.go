@@ -6,15 +6,19 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"strconv"
 
 	_ "github.com/lib/pq"
 )
 
 type Movie struct {
-	ID     int64   `json:"id"`
-	Title  string  `json:"title"`
-	Year   int     `json:"year"`
-	Rating float32 `json:"rating"`
+	ID        int64   `json:"id"`
+	Title     string  `json:"title"`
+	Year      int     `json:"year"`
+	Rating    float32 `json:"rating"`
+	Genre     string  `json:"genre"`
+	Overview  string  `json:"overview"`
+	PosterURL string  `json:"poster_url"`
 }
 
 func openDB() (*sql.DB, error) {
@@ -53,7 +57,34 @@ func main() {
 			return
 		}
 
-		rows, err := db.Query(`SELECT id, title, year, rating FROM movies ORDER BY year DESC`)
+		genre := r.URL.Query().Get("genre")
+		yearStr := r.URL.Query().Get("year")
+
+		query := `SELECT id, title, year, rating, genre, overview, poster_url FROM movies`
+		var args []any
+		var where []string
+
+		if genre != "" {
+			where = append(where, "genre = $1")
+			args = append(args, genre)
+		}
+		if yearStr != "" {
+			if y, err := strconv.Atoi(yearStr); err == nil {
+				where = append(where, "year = $2")
+				args = append(args, y)
+			}
+		}
+
+		if len(where) > 0 {
+			query += " WHERE " + where[0]
+			if len(where) == 2 {
+				query += " AND " + where[1]
+			}
+		}
+
+		query += " ORDER BY year DESC, rating DESC"
+
+		rows, err := db.Query(query, args...)
 		if err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			return
@@ -63,7 +94,7 @@ func main() {
 		var movies []Movie
 		for rows.Next() {
 			var m Movie
-			if err := rows.Scan(&m.ID, &m.Title, &m.Year, &m.Rating); err != nil {
+			if err := rows.Scan(&m.ID, &m.Title, &m.Year, &m.Rating, &m.Genre, &m.Overview, &m.PosterURL); err != nil {
 				w.WriteHeader(http.StatusInternalServerError)
 				return
 			}

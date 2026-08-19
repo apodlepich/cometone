@@ -2,14 +2,71 @@
 <html lang="ru">
 <head>
   <meta charset="utf-8" />
-  <title>Каталог фильмов</title>
+  <title>Cometone · Каталог фильмов</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
   <link rel="stylesheet" href="/static/style.css" />
 </head>
 <body>
-  <div class="app">
-    <h1>Каталог фильмов</h1>
-    <div id="movies"></div>
+  <div class="page">
+    <aside class="sidebar">
+      <div class="logo">Cometone</div>
+      <nav class="nav">
+        <button class="nav-btn nav-btn--active" data-view="catalog">Каталог</button>
+        <button class="nav-btn" data-view="about">О проекте</button>
+      </nav>
+      <div class="sidebar-footer">
+        <p>Простой учебный каталог фильмов на Go + PostgreSQL.</p>
+      </div>
+    </aside>
+
+    <main class="content">
+      <header class="header">
+        <div>
+          <h1>Каталог фильмов</h1>
+          <p class="header-subtitle">Ищи фильмы по жанру и году, смотри описание и рейтинг.</p>
+        </div>
+        <div class="filters">
+          <input id="search" type="text" placeholder="Поиск по названию" />
+          <select id="genre">
+            <option value="">Все жанры</option>
+            <option value="Drama">Драма</option>
+            <option value="Action">Боевик</option>
+            <option value="Comedy">Комедия</option>
+            <option value="Sci-Fi">Фантастика</option>
+          </select>
+          <input id="year" type="number" placeholder="Год" />
+          <button id="filter-btn">Фильтр</button>
+        </div>
+      </header>
+
+      <section id="view-catalog" class="view view--active">
+        <div id="movies" class="movies-grid"></div>
+      </section>
+
+      <section id="view-about" class="view">
+        <div class="about">
+          <h2>О проекте</h2>
+          <p>
+            Cometone — это учебный проект каталога фильмов.
+            Backend написан на Go и работает с PostgreSQL, фронтенд — на чистом HTML/CSS/JS.
+          </p>
+          <p>
+            Ты можешь доработать его, добавив регистрацию пользователей, избранное,
+            рецензии и интеграцию с внешними API.
+          </p>
+        </div>
+      </section>
+    </main>
   </div>
+
+  <div id="modal" class="modal" aria-hidden="true">
+    <div class="modal-backdrop"></div>
+    <div class="modal-content" role="dialog" aria-modal="true">
+      <button id="modal-close" class="modal-close" aria-label="Закрыть">×</button>
+      <div id="modal-body"></div>
+    </div>
+  </div>
+
   <script src="/static/script.js"></script>
 </body>
 </html>
